@@ -14,6 +14,7 @@ type expr =
   | Call of expr * expr list
   | Identifier of string
   | AttributeAccess of expr * string
+  | New of type_ * expr list
 
 type parameter = {type_: type_; name: string; default: expr option}
 

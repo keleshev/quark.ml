@@ -47,6 +47,10 @@ module TestExprs = struct
   let () = test "grouping with parenthesis" @@ fun () ->
     expr "(a + b) * c" => Infix (Infix (a, Plus, b), Mul, c);
     expr "a * (b + c)" => Infix (a, Mul, Infix (b, Plus, c))
+
+  let () = test "new" @@ fun () ->
+    expr "new Foo<Bar>(a, b, c)" => New (Type (["Foo"], [Type (["Bar"], [])]),
+                                         [a; b; c])
 end
 
 module TestStatements = struct

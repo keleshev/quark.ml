@@ -84,8 +84,7 @@ type_: path=path parameters=loption(type_parameters)
 type_parameters: chevroned(comma_separated(type_)) { $1 }
 path: separated_nonempty_list(DOT, ID) { $1 }
 
-var:
-| type_=type_ name=ID initial=preceded(EQ, expr)? SEMI
+var: type_=type_ name=ID initial=preceded(EQ, expr)? SEMI
     { type_, name, initial }
 
 statement:
@@ -115,6 +114,7 @@ expr:
 | e=expr arguments=arguments { Call (e, arguments) }
 | e=parenthesised(expr) { e }
 | e=lvalue { e }
+| NEW type_=type_ arguments=arguments { New (type_, arguments) }
 
 arguments: parenthesised(comma_separated(expr)) { $1 }
 
