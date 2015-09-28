@@ -42,19 +42,19 @@ annotation: AT name=ID arguments=loption(arguments) { name, arguments }
 annotated(ITEM): items=pair(annotation*, ITEM) { items }
 
 top_level_item:
-| function_ { `PackageItem $1 }
-| class_ { `PackageItem $1 }
-| package { `PackageItem $1 }
-| macro { `TopLevelMacro $1 }
+| function_ { PackageItem $1 }
+| class_ { PackageItem $1 }
+| package { PackageItem $1 }
+| macro { TopLevelMacro $1 }
 
-function_: signature=signature body=block { `Function (signature, body) }
+function_: signature=signature body=block { Function (signature, body) }
 
 class_: hierarchy=hierarchy name=ID parameters=loption(type_parameters)
         super=preceded(EXTENDS, ID)? body=braced(annotated(class_item)*)
-    { `Hierarchy (hierarchy, name, parameters, super, body) }
+    { Hierarchy (hierarchy, name, parameters, super, body) }
 
 package: PACKAGE name=ID items=braced(annotated(package_item)*)
-    { `Package (name, items) }
+    { Package (name, items) }
 
 package_item:
 | package { $1 }
@@ -62,12 +62,12 @@ package_item:
 | function_ { $1 }
 
 class_item:
-| signature SEMI { `Prototype $1  }
-| signature=signature body=block { `Method (signature, body) }
-| var { `Field $1 }
+| signature SEMI { Prototype $1  }
+| signature=signature body=block { Method (signature, body) }
+| var { Field $1 }
 | name=ID parameters=parameters body=block
-    { `Constructor (name, parameters, body) }
-| macro { `ClassMacro $1 }
+    { Constructor (name, parameters, body) }
+| macro { ClassMacro $1 }
 
 macro: MACRO signature=signature e=expr SEMI { signature, e }
 
@@ -75,12 +75,12 @@ signature: type_=type_ name=ID parameters=parameters
     { type_, name, parameters }
 
 hierarchy:
-| CLASS { `Class }
-| INTERFACE { `Interface }
-| PRIMITIVE { `Primitive }
+| CLASS { Class }
+| INTERFACE { Interface }
+| PRIMITIVE { Primitive }
 
 type_: path=path parameters=loption(type_parameters)
-    { `Type (path, parameters) }
+    { Type (path, parameters) }
 type_parameters: chevroned(comma_separated(type_)) { $1 }
 path: separated_nonempty_list(DOT, ID) { $1 }
 
@@ -89,14 +89,14 @@ var:
     { type_, name, initial }
 
 statement:
-| RETURN e=expr SEMI { `Return e }
-| IF condition=condition consequence=block { `If (condition, consequence) }
+| RETURN e=expr SEMI { Return e }
+| IF condition=condition consequence=block { If (condition, consequence) }
 | IF condition=condition consequence=block ELSE alternative=block
-    { `IfElse (condition, consequence, alternative) }
-| WHILE condition=condition body=block { `While (condition, body) }
-| e=expr SEMI { `Expr e }
-| VAR var=var { `Local var }
-| left=lvalue EQ right=expr SEMI { `Assignment (left, right) }
+    { IfElse (condition, consequence, alternative) }
+| WHILE condition=condition body=block { While (condition, body) }
+| e=expr SEMI { Expr e }
+| VAR var=var { Local var }
+| left=lvalue EQ right=expr SEMI { Assignment (left, right) }
 
 parameter: type_=type_ name=ID default=preceded(EQ, expr)?
     { {type_; name; default} }
@@ -105,41 +105,41 @@ condition: parenthesised(expr) { $1 }
 block: braced(statement*) { $1 }
 
 expr:
-| STRING { `String $1 }
-| NUMBER { `Number $1 }
-| NULL { `Null }
-| bracketed(comma_separated(expr)) { `List $1 }
-| braced(comma_separated(separated_pair(expr, COLON, expr))) { `Map $1 }
-| left=expr op=infix_operator right=expr { `Infix (left, op, right) }
-| op=unary_operator e=expr %prec UNARY_PRECEDENCE { `Unary (op, e) }
-| e=expr arguments=arguments { `Call (e, arguments) }
+| STRING { String $1 }
+| NUMBER { Number $1 }
+| NULL { Null }
+| bracketed(comma_separated(expr)) { List $1 }
+| braced(comma_separated(separated_pair(expr, COLON, expr))) { Map $1 }
+| left=expr op=infix_operator right=expr { Infix (left, op, right) }
+| op=unary_operator e=expr %prec UNARY_PRECEDENCE { Unary (op, e) }
+| e=expr arguments=arguments { Call (e, arguments) }
 | e=parenthesised(expr) { e }
 | e=lvalue { e }
 
 arguments: parenthesised(comma_separated(expr)) { $1 }
 
 lvalue:
-| ID { `Identifier $1 }
-| e=expr DOT attribute=ID { `AttributeAccess (e, attribute) }
+| ID { Identifier $1 }
+| e=expr DOT attribute=ID { AttributeAccess (e, attribute) }
 
 %inline unary_operator:
-| NOT { `Not }
-| TWIDDLE { `Twiddle }
-| MINUS { `Negated }
+| NOT { Not }
+| TWIDDLE { Twiddle }
+| MINUS { Negated }
 
 %inline infix_operator:
-| OR { `Or }
-| AND { `And }
-| PLUS { `Plus }
-| MINUS { `Minus }
-| MUL { `Mul }
-| DIV { `Div }
-| GE { `Ge }
-| LE { `Le }
-| LT { `Lt }
-| GT { `Gt }
-| EQL { `Eql }
-| NEQ { `Neq }
+| OR { Or }
+| AND { And }
+| PLUS { Plus }
+| MINUS { Minus }
+| MUL { Mul }
+| DIV { Div }
+| GE { Ge }
+| LE { Le }
+| LT { Lt }
+| GT { Gt }
+| EQL { Eql }
+| NEQ { Neq }
 
 parenthesised(BODY): LPR body=BODY RPR { body }
 bracketed(BODY):     LBK body=BODY RBK { body }
