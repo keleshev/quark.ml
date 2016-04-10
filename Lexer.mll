@@ -27,7 +27,6 @@
     | other       -> ID other
 }
 
-let whitespace = ' ' | '\t' | '\n' | '\r'
 let identifier = ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 
 let line_comment = "//" (_ # '\n')*
@@ -63,7 +62,8 @@ let number_literal = nonzero_dec (dec_digit | '_')* float_suffix?
                          )
 
 rule read = parse
-  | whitespace { read lexbuf }
+  | [' ' '\t' '\r']+ { read lexbuf }
+  | '\n' { Lexing.new_line lexbuf; read lexbuf }
   | "{"  { LBR     }
   | "}"  { RBR     }
   | "["  { LBK     }
@@ -97,7 +97,7 @@ rule read = parse
   | number_literal as string { NUMBER string }
   | identifier as id { parse_identifier id }
   | eof { EOF }
-  | _ { failwith "lexer error" }
+  | _ { raise Parser.Error }
 
 and read_string buffer = parse
   | '"' { STRING (Buffer.contents buffer) }
@@ -105,5 +105,6 @@ and read_string buffer = parse
     { Buffer.add_string buffer (Scanf.unescaped string);
       read_string buffer lexbuf }
   | _ # '"' as char
-    { Buffer.add_char buffer char;
+    { if char = '\n' then Lexing.new_line lexbuf;
+      Buffer.add_char buffer char;
       read_string buffer lexbuf }
