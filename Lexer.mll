@@ -80,6 +80,7 @@ rule read = parse
   | "~"  { TWIDDLE }
   | "."  { DOT     }
   | "*"  { MUL     }
+  | "?"  { CAST    }
   | "/"  { DIV     }
   | ">=" { GE      }
   | "<=" { LE      }

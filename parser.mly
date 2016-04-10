@@ -7,7 +7,7 @@
 %start <Syntax.top_level> parse_top_level
 
 %token LBR RBR LBK RBK LPR RPR COLON COMMA SEMI EQ PLUS MINUS NOT TWIDDLE DOT
-       MUL DIV GE LE LT GT EQL NEQ AND OR AT
+       MUL DIV GE LE LT GT EQL NEQ AND OR AT CAST
 
 %token PACKAGE CLASS INTERFACE PRIMITIVE EXTENDS RETURN MACRO NEW NULL IF ELSE
        WHILE NAMESPACE USE INCLUDE STATIC BREAK CONTINUE IMPORT AS TRUE FALSE
@@ -145,6 +145,7 @@ arguments: parenthesised(comma_separated(expr)) { $1 }
 | NOT { Not }
 | TWIDDLE { Twiddle }
 | MINUS { Negated }
+| CAST { Cast }
 
 %inline infix_operator:
 | OR { Or }

@@ -45,7 +45,8 @@ module TestExprs = struct
   let () = test "unary" @@ fun () ->
     expr "!a" => Unary (Not, a);
     expr "~a" => Unary (Twiddle, a);
-    expr "-a" => Unary (Negated, a)
+    expr "-a" => Unary (Negated, a);
+    expr "?a" => Unary (Cast, a)
 
   let () = test "attribute" @@ fun () ->
     expr "foo.bar" => AttributeAccess (Identifier "foo", "bar");

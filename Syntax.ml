@@ -5,7 +5,7 @@ type infix =
   And | Or | Plus | Minus | Mul | Div | Ge | Le | Lt | Gt | Eql | Neq
   [@@deriving to_yojson]
 
-type unary = Not | Twiddle | Negated
+type unary = Not | Twiddle | Negated | Cast
   [@@deriving to_yojson]
 
 type expr =
