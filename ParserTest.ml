@@ -24,6 +24,8 @@ module TestExprs = struct
   let () = test "literals" @@ fun () ->
     expr "123" => Number 123;
     expr "null" => Null;
+    expr "true" => Boolean true;
+    expr "false" => Boolean false;
     expr "[123, null, \"hai\"]" => List [Number 123; Null; String "hai"];
     expr "{123: null, \"hai\": 456}" => Map [Number 123, Null;
                                              String "hai", Number 456]
@@ -118,7 +120,7 @@ module TestTopLevelItems = struct
   let () = test "function" @@ fun () ->
     item "int f(bool b=true, char c) { return; }"
       => NamespaceItem (Function (Signature (type_ "int", "f", [
-        {type_=type_ "bool"; name="b"; value=Some (Identifier "true")};
+        {type_=type_ "bool"; name="b"; value=Some (Boolean true)};
         {type_=type_ "char"; name="c"; value=None};
       ]), [Return None]))
 

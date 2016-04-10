@@ -10,7 +10,7 @@
        MUL DIV GE LE LT GT EQL NEQ AND OR AT
 
 %token PACKAGE CLASS INTERFACE PRIMITIVE EXTENDS RETURN MACRO NEW NULL IF ELSE
-       WHILE NAMESPACE USE INCLUDE STATIC BREAK CONTINUE IMPORT AS
+       WHILE NAMESPACE USE INCLUDE STATIC BREAK CONTINUE IMPORT AS TRUE FALSE
 
 %token <string> ID STRING VERSION URL
 %token <int> NUMBER
@@ -126,6 +126,8 @@ expr_no_infix:
 make_expr(__expr__):
 | STRING { String $1 }
 | NUMBER { Number $1 }
+| TRUE { Boolean true }
+| FALSE { Boolean false }
 | NULL { Null }
 | bracketed(comma_separated(expr)) { List $1 }
 | braced(comma_separated(separated_pair(expr, COLON, expr))) { Map $1 }

@@ -11,6 +11,8 @@
     | "static"    -> STATIC
     | "break"     -> BREAK
     | "continue"  -> CONTINUE
+    | "true"      -> TRUE
+    | "false"     -> FALSE
     | "class"     -> CLASS
     | "interface" -> INTERFACE
     | "primitive" -> PRIMITIVE

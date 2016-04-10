@@ -11,6 +11,7 @@ type unary = Not | Twiddle | Negated
 type expr =
   | String of string
   | Number of int
+  | Boolean of bool
   | Null
   | List of expr list
   | Map of (expr * expr) list
