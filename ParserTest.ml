@@ -151,6 +151,10 @@ module TestTopLevelItems = struct
            {annotations=[];
             item=NamespaceMacro (Signature (type_ "int", "MACRO", []), a)};
          ]))
+
+  let () = test "package" @@ fun () ->
+    item "package foo 1.2.3-ab.cd+12.34;"
+      => Package ("foo", "1.2.3-ab.cd+12.34")
 end
 
 module TestTopLevel = struct

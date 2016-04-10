@@ -73,6 +73,7 @@ type namespace_item =
   [@@deriving to_yojson]
 
 type top_level_item =
+  | Package of string * string
   | NamespaceItem of namespace_item
   | TopLevelMacro of macro
   [@@deriving to_yojson]

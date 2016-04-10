@@ -21,6 +21,14 @@
 let whitespace = ' ' | '\t' | '\n' | '\r'
 let identifier = ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 
+let numeric = ['1'-'9'] ['0'-'9']* | '0' (* no leading zeroes *)
+(* TODO leading zeroes inside sections are not allowed either *)
+let section = ['a'-'z' 'A'-'Z' '0'-'9' '_']+
+let pre_release = section ('.' section)*
+let build_metadata = section ('.' section)*
+let version =
+  numeric '.' numeric '.' numeric ('-' pre_release)? ('+' build_metadata)?
+
 rule read = parse
   | whitespace { read lexbuf }
   | "{"  { LBR     }
@@ -49,6 +57,7 @@ rule read = parse
   | "&&" { AND     }
   | "||" { OR      }
   | "@"  { AT      }
+  | version as string { VERSION string }
   | '"' (_* as string) '"' { STRING string }
   | ['0'-'9']* as number { NUMBER (int_of_string number) }
   | identifier as id { parse_identifier id }

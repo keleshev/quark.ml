@@ -12,7 +12,7 @@
 %token PACKAGE CLASS INTERFACE PRIMITIVE EXTENDS RETURN MACRO NEW NULL IF ELSE
        WHILE NAMESPACE
 
-%token <string> ID STRING
+%token <string> ID STRING VERSION
 %token <int> NUMBER
 
 %token EOF
@@ -43,6 +43,7 @@ annotation: AT name=ID arguments=loption(arguments) { name, arguments }
 annotated(ITEM): annotations=annotation* item=ITEM { {annotations; item} }
 
 top_level_item:
+| PACKAGE name=ID version=VERSION SEMI { Package (name, version) }
 | function_ { NamespaceItem $1 }
 | class_ { NamespaceItem $1 }
 | namespace { NamespaceItem $1 }
@@ -63,7 +64,7 @@ namespace_item:
 | function_ { $1 }
 | macro { NamespaceMacro $1 }
 
-namespace_keyword: PACKAGE | NAMESPACE {}
+%inline namespace_keyword: PACKAGE | NAMESPACE {}
 
 class_item:
 | signature SEMI { Prototype $1  }
