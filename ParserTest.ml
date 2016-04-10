@@ -17,8 +17,11 @@ module TestExprs = struct
   let () = test "identifier" @@ fun () ->
     expr "foo" => Identifier "foo"
 
+  let () = test "strings" @@ fun () ->
+    expr {|"hai"|} => String "hai";
+    expr {|"\n \r \t \\ \x41"|} => String "\n \r \t \\ A"
+
   let () = test "literals" @@ fun () ->
-    expr "\"hai\"" => String "hai";
     expr "123" => Number 123;
     expr "null" => Null;
     expr "[123, null, \"hai\"]" => List [Number 123; Null; String "hai"];
