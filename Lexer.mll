@@ -30,6 +30,7 @@
 let whitespace = ' ' | '\t' | '\n' | '\r'
 let identifier = ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 
+let line_comment = "//" (_ # '\n')*
 
 let numeric = ['1'-'9'] ['0'-'9']* | '0' (* no leading zeroes *)
 (* TODO leading zeroes inside sections are not allowed either *)
@@ -72,6 +73,7 @@ rule read = parse
   | "&&" { AND     }
   | "||" { OR      }
   | "@"  { AT      }
+  | line_comment { read lexbuf }
   | version as string { VERSION string }
   | url as string { URL string }
   | '"' { read_string (Buffer.create 16) lexbuf }
