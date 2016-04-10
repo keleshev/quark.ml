@@ -95,7 +95,9 @@ statement:
 | WHILE condition=condition body=block { While (condition, body) }
 | e=expr SEMI { Expr e }
 | VAR var=var { Local var }
-| left=lvalue EQ right=expr SEMI { Assignment (left, right) }
+| left=ID EQ right=expr SEMI { Assignment (Identifier left, right) }
+| e=expr DOT attribute=ID EQ right=expr SEMI
+    { Assignment (AttributeAccess (e, attribute), right) }
 
 parameter: type_=type_ name=ID value=preceded(EQ, expr)?
   { {type_; name; value} }
@@ -113,14 +115,11 @@ expr:
 | op=unary_operator e=expr %prec UNARY_PRECEDENCE { Unary (op, e) }
 | e=expr arguments=arguments { Call (e, arguments) }
 | e=parenthesised(expr) { e }
-| e=lvalue { e }
+| ID { Identifier $1 }
+| e=expr DOT attribute=ID { AttributeAccess (e, attribute) }
 | NEW type_=type_ arguments=arguments { New (type_, arguments) }
 
 arguments: parenthesised(comma_separated(expr)) { $1 }
-
-lvalue:
-| ID { Identifier $1 }
-| e=expr DOT attribute=ID { AttributeAccess (e, attribute) }
 
 %inline unary_operator:
 | NOT { Not }
