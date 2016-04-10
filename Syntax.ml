@@ -64,16 +64,16 @@ type class_item =
   | ClassMacro of macro
   [@@deriving to_yojson]
 
-type package_item =
-  | Package of string * package_item annotated list
+type namespace_item =
+  | Namespace of string * namespace_item annotated list
   | Function of signature * statement list
   | Hierarchy of hierarchy * string * type_ list * string option
                 * class_item annotated list
-  | PackageMacro of macro
+  | NamespaceMacro of macro
   [@@deriving to_yojson]
 
 type top_level_item =
-  | PackageItem of package_item
+  | NamespaceItem of namespace_item
   | TopLevelMacro of macro
   [@@deriving to_yojson]
 

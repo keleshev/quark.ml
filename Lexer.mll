@@ -3,6 +3,7 @@
 
   let parse_identifier = function
     | "package"   -> PACKAGE
+    | "namespace" -> NAMESPACE
     | "class"     -> CLASS
     | "interface" -> INTERFACE
     | "primitive" -> PRIMITIVE

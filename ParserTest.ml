@@ -105,7 +105,7 @@ let type_ name = Type ([name], [])
 module TestTopLevelItems = struct
   let () = test "function" @@ fun () ->
     item "int f(bool b=true, char c) { return a; }"
-      => PackageItem (Function (Signature (type_ "int", "f", [
+      => NamespaceItem (Function (Signature (type_ "int", "f", [
         {type_=type_ "bool"; name="b"; value=Some (Identifier "true")};
         {type_=type_ "char"; name="c"; value=None};
       ]), [Return a]))
@@ -118,7 +118,7 @@ module TestTopLevelItems = struct
             int method() { return a; }
             macro int MACRO() a;
           }"
-      => PackageItem (Hierarchy (Class, "Foo", [type_ "T";
+      => NamespaceItem (Hierarchy (Class, "Foo", [type_ "T";
                                                 type_ "U"], Some "Bar", [
            {annotations=[];
             item=Field {type_=type_ "int"; name="field"; value=Some a}};
@@ -132,41 +132,42 @@ module TestTopLevelItems = struct
             item=ClassMacro (Signature (type_ "int", "MACRO", []), a)};
          ]))
 
-  let () = test "package" @@ fun () ->
-    item "package foo {
-            package bar { }
+  let () = test "namespace" @@ fun () ->
+    item "package foo {}" => NamespaceItem (Namespace ("foo", []));
+    item "namespace foo {
+            namespace bar { }
             int function() { return a; }
             class baz { }
             macro int MACRO() a;
           }"
-      => PackageItem (Package ("foo", [
+      => NamespaceItem (Namespace ("foo", [
            {annotations=[];
-            item=Package ("bar", [])};
+            item=Namespace ("bar", [])};
            {annotations=[];
             item=Function (Signature (type_ "int", "function", []),
                            [Return a])};
            {annotations=[];
             item=Hierarchy (Class, "baz", [], None, [])};
            {annotations=[];
-            item=PackageMacro (Signature (type_ "int", "MACRO", []), a)};
+            item=NamespaceMacro (Signature (type_ "int", "MACRO", []), a)};
          ]))
 end
 
 module TestTopLevel = struct
   let () = test "top_level" @@ fun () ->
-    top "package foo { }
+    top "namespace foo { }
          macro int bar() a;"
       => TopLevel [
         {annotations=[];
-         item=PackageItem (Package ("foo", []))};
+         item=NamespaceItem (Namespace ("foo", []))};
         {annotations=[];
          item=TopLevelMacro (Signature (type_ "int", "bar", []), a)};
       ];
-    top "@qux package foo { }
+    top "@qux namespace foo { }
          @mux(b, c) @lux macro int bar() a;"
       => TopLevel [
         {annotations=["qux", []];
-         item=PackageItem (Package ("foo", []))};
+         item=NamespaceItem (Namespace ("foo", []))};
         {annotations=["mux", [b; c]; "lux", []];
          item= TopLevelMacro (Signature (type_ "int", "bar", []), a)};
       ]

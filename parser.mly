@@ -10,7 +10,7 @@
        MUL DIV GE LE LT GT EQL NEQ AND OR AT
 
 %token PACKAGE CLASS INTERFACE PRIMITIVE EXTENDS RETURN MACRO NEW NULL IF ELSE
-       WHILE
+       WHILE NAMESPACE
 
 %token <string> ID STRING
 %token <int> NUMBER
@@ -43,9 +43,9 @@ annotation: AT name=ID arguments=loption(arguments) { name, arguments }
 annotated(ITEM): annotations=annotation* item=ITEM { {annotations; item} }
 
 top_level_item:
-| function_ { PackageItem $1 }
-| class_ { PackageItem $1 }
-| package { PackageItem $1 }
+| function_ { NamespaceItem $1 }
+| class_ { NamespaceItem $1 }
+| namespace { NamespaceItem $1 }
 | macro { TopLevelMacro $1 }
 
 function_: signature=signature body=block { Function (signature, body) }
@@ -54,14 +54,16 @@ class_: hierarchy=hierarchy name=ID parameters=loption(type_parameters)
         super=preceded(EXTENDS, ID)? body=braced(annotated(class_item)*)
     { Hierarchy (hierarchy, name, parameters, super, body) }
 
-package: PACKAGE name=ID items=braced(annotated(package_item)*)
-    { Package (name, items) }
+namespace: namespace_keyword name=ID items=braced(annotated(namespace_item)*)
+    { Namespace (name, items) }
 
-package_item:
-| package { $1 }
+namespace_item:
+| namespace { $1 }
 | class_ { $1 }
 | function_ { $1 }
-| macro { PackageMacro $1 }
+| macro { NamespaceMacro $1 }
+
+namespace_keyword: PACKAGE | NAMESPACE {}
 
 class_item:
 | signature SEMI { Prototype $1  }
