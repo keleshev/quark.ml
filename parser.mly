@@ -94,7 +94,7 @@ var: type_=type_ name=ID value=preceded(EQ, expr)? SEMI
   { {type_; name; value} }
 
 statement:
-| RETURN e=expr SEMI { Return e }
+| RETURN e=expr? SEMI { Return e }
 | BREAK SEMI { Break }
 | CONTINUE SEMI { Continue }
 | IMPORT path=path alias=preceded(AS, ID)? SEMI { Import {path; alias} }

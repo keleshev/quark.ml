@@ -58,7 +58,8 @@ end
 
 module TestStatements = struct
   let () = test "return/break/continue" @@ fun () ->
-    statement "return a;" => Return a;
+    statement "return a;" => Return (Some a);
+    statement "return;" => Return None;
     statement "continue;" => Continue;
     statement "break;" => Break
 
@@ -69,12 +70,12 @@ module TestStatements = struct
       => Import {path=["foo"; "baz"]; alias=Some "qux"}
 
   let () = test "if else" @@ fun () ->
-    statement "if (a) { return a; }" => If (a, [Return a]);
-    statement "if (a) { return a; } else { return b; }"
-      => IfElse (a, [Return a], [Return b])
+    statement "if (a) { return a; }" => If (a, [Return (Some a)]);
+    statement "if (a) { return; } else { return; }"
+      => IfElse (a, [Return None], [Return None])
 
   let () = test "while" @@ fun () ->
-    statement "while (a) { return b; }" => While (a, [Return b])
+    statement "while (a) { return; }" => While (a, [Return None])
 
   let () = test "expr statement" @@ fun () ->
     statement "null.bar;" => Expr (AttributeAccess (Null, "bar"));
@@ -115,20 +116,20 @@ let type_ name = Type ([name], [])
 
 module TestTopLevelItems = struct
   let () = test "function" @@ fun () ->
-    item "int f(bool b=true, char c) { return a; }"
+    item "int f(bool b=true, char c) { return; }"
       => NamespaceItem (Function (Signature (type_ "int", "f", [
         {type_=type_ "bool"; name="b"; value=Some (Identifier "true")};
         {type_=type_ "char"; name="c"; value=None};
-      ]), [Return a]))
+      ]), [Return None]))
 
   let () = test "class" @@ fun () ->
     item "class Foo<T, U> extends Bar {
             int field = a;
             static int field = a;
-            constructor() { return a; }
+            constructor() { return; }
             int prototype();
-            int method() { return a; }
-            static int method() { return a; }
+            int method() { return; }
+            static int method() { return; }
             macro int MACRO() a;
           }"
       => NamespaceItem (Hierarchy (Class, "Foo", [type_ "T";
@@ -138,13 +139,13 @@ module TestTopLevelItems = struct
            {annotations=[];
             item=StaticField {type_=type_ "int"; name="field"; value=Some a}};
            {annotations=[];
-            item=Constructor ("constructor", [], [Return a])};
+            item=Constructor ("constructor", [], [Return None])};
            {annotations=[];
             item=Prototype (Signature (type_ "int", "prototype", []))};
            {annotations=[];
-           item=Method (Signature (type_ "int", "method", []), [Return a])};
+           item=Method (Signature (type_ "int", "method", []), [Return None])};
            {annotations=[];
-           item=StaticMethod (Signature (type_ "int", "method", []), [Return a])};
+           item=StaticMethod (Signature (type_ "int", "method", []), [Return None])};
            {annotations=[];
             item=ClassMacro (Signature (type_ "int", "MACRO", []), a)};
          ]))
@@ -153,7 +154,7 @@ module TestTopLevelItems = struct
     item "package foo {}" => NamespaceItem (Namespace ("foo", []));
     item "namespace foo {
             namespace bar { }
-            int function() { return a; }
+            int function() { return; }
             class baz { }
             macro int MACRO() a;
           }"
@@ -162,7 +163,7 @@ module TestTopLevelItems = struct
             item=Namespace ("bar", [])};
            {annotations=[];
             item=Function (Signature (type_ "int", "function", []),
-                           [Return a])};
+                           [Return None])};
            {annotations=[];
             item=Hierarchy (Class, "baz", [], None, [])};
            {annotations=[];

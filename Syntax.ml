@@ -41,7 +41,7 @@ type import = {path: string list; alias: string option}
   [@@deriving to_yojson]
 
 type statement =
-  | Return of expr
+  | Return of expr option
   | Break
   | Continue
   | Import of import
