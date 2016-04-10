@@ -132,11 +132,12 @@ module TestTopLevelItems = struct
             item=ClassMacro (Signature (type_ "int", "MACRO", []), a)};
          ]))
 
-  let () = test "class" @@ fun () ->
+  let () = test "package" @@ fun () ->
     item "package foo {
             package bar { }
             int function() { return a; }
             class baz { }
+            macro int MACRO() a;
           }"
       => PackageItem (Package ("foo", [
            {annotations=[];
@@ -146,6 +147,8 @@ module TestTopLevelItems = struct
                            [Return a])};
            {annotations=[];
             item=Hierarchy (Class, "baz", [], None, [])};
+           {annotations=[];
+            item=PackageMacro (Signature (type_ "int", "MACRO", []), a)};
          ]))
 end
 

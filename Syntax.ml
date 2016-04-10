@@ -69,9 +69,12 @@ type package_item =
   | Function of signature * statement list
   | Hierarchy of hierarchy * string * type_ list * string option
                 * class_item annotated list
+  | PackageMacro of macro
   [@@deriving to_yojson]
 
-type top_level_item = PackageItem of package_item | TopLevelMacro of macro
+type top_level_item =
+  | PackageItem of package_item
+  | TopLevelMacro of macro
   [@@deriving to_yojson]
 
 type top_level = TopLevel of top_level_item annotated list

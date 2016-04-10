@@ -61,6 +61,7 @@ package_item:
 | package { $1 }
 | class_ { $1 }
 | function_ { $1 }
+| macro { PackageMacro $1 }
 
 class_item:
 | signature SEMI { Prototype $1  }
