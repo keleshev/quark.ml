@@ -1,4 +1,7 @@
-type type_ = Type of string list * type_ list
+type path = Path of string list
+  [@@deriving to_yojson]
+
+type type_ = Type of path * type_ list
   [@@deriving to_yojson]
 
 type infix =
@@ -38,7 +41,7 @@ type 'a annotated = {annotations: annotation list; item: 'a}
 type variable = binding
   [@@deriving to_yojson]
 
-type import = {path: string list; alias: string option}
+type import = {path: path; alias: string option}
   [@@deriving to_yojson]
 
 type statement =

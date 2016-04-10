@@ -61,8 +61,8 @@ module TestExprs = struct
     expr "a * (b + c)" => Infix (a, Mul, Infix (b, Plus, c))
 
   let () = test "new" @@ fun () ->
-    expr "new Foo<Bar>(a, b, c)" => New (Type (["Foo"], [Type (["Bar"], [])]),
-                                         [a; b; c])
+    expr "new Foo<Bar>(a, b, c)" =>
+      New (Type (Path ["Foo"], [Type (Path ["Bar"], [])]), [a; b; c])
 end
 
 module TestStatements = struct
@@ -74,9 +74,9 @@ module TestStatements = struct
 
   let () = test "import" @@ fun () ->
     statement "import foo.baz;"
-      => ImportStatement {path=["foo"; "baz"]; alias=None};
+      => ImportStatement {path=Path ["foo"; "baz"]; alias=None};
     statement "import foo.baz as qux;"
-      => ImportStatement {path=["foo"; "baz"]; alias=Some "qux"}
+      => ImportStatement {path=Path ["foo"; "baz"]; alias=Some "qux"}
 
   let () = test "if else" @@ fun () ->
     statement "if (a) { return a; }" => If (a, [Return (Some a)]);
@@ -96,11 +96,11 @@ module TestStatements = struct
 
   let () = test "local variable" @@ fun () ->
     statement "foo a;" =>
-      Local {type_=Type (["foo"], []); name="a"; value=None};
+      Local {type_=Type (Path ["foo"], []); name="a"; value=None};
     statement "foo a = b;" =>
-      Local {type_=Type (["foo"], []); name="a"; value=Some b};
+      Local {type_=Type (Path ["foo"], []); name="a"; value=Some b};
     statement "a < b > c;" =>
-      Local {type_=Type (["a"], [Type (["b"], [])]); name="c"; value=None}
+      Local {type_=Type (Path ["a"], [Type (Path ["b"], [])]); name="c"; value=None}
 
   let () = test "assignment" @@ fun () ->
     statement "a = c;"
@@ -113,15 +113,18 @@ end
 
 module TestTypes = struct
   let () = test "type" @@ fun () ->
-    type_ "foo" => Type (["foo"], []);
-    type_ "foo.bar" => Type (["foo"; "bar"], []);
-    type_ "foo.bar<>" => Type (["foo"; "bar"], []);
-    type_ "foo.bar<baz>" => Type (["foo"; "bar"], [Type (["baz"], [])]);
+    type_ "foo" => Type (Path ["foo"], []);
+    type_ "foo.bar" => Type (Path ["foo"; "bar"], []);
+    type_ "foo.bar<>" => Type (Path ["foo"; "bar"], []);
+    type_ "foo.bar<baz>" => Type (Path ["foo"; "bar"],
+                                  [Type (Path ["baz"], [])]);
     type_ "foo.bar<baz<qux>>"
-      => Type (["foo"; "bar"], [Type (["baz"], [Type (["qux"], [])])]);
+      => Type (Path ["foo"; "bar"],
+               [Type (Path ["baz"],
+                      [Type (Path ["qux"], [])])]);
 end
 
-let type_ name = Type ([name], [])
+let type_ name = Type (Path [name], [])
 
 module TestTopLevelItems = struct
   let () = test "function" @@ fun () ->
@@ -130,6 +133,15 @@ module TestTopLevelItems = struct
         {type_=type_ "bool"; name="b"; value=Some (Boolean true)};
         {type_=type_ "char"; name="c"; value=None};
       ]), [Return None]))
+
+(*
+  let () = test "class" @@ fun () ->
+    item "class Foo<T, U> extends bar.Bar, baz.Baz {}"
+      => NamespaceItem (Hierarchy (Class, "Foo",
+                                   [type_ "T"; type_ "U"],
+                                   [["bar"; "Bar"]; ["baz"; "Baz"],
+                                   []))
+*)
 
   let () = test "class" @@ fun () ->
     item "class Foo<T, U> extends Bar {
@@ -189,9 +201,9 @@ module TestTopLevelItems = struct
 
   let () = test "import" @@ fun () ->
     item "import foo.baz;"
-      => Import {path=["foo"; "baz"]; alias=None};
+      => Import {path=Path ["foo"; "baz"]; alias=None};
     item "import foo.baz as qux;"
-      => Import {path=["foo"; "baz"]; alias=Some "qux"}
+      => Import {path=Path ["foo"; "baz"]; alias=Some "qux"}
 end
 
 module TestTopLevel = struct

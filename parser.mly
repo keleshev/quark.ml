@@ -88,7 +88,7 @@ hierarchy:
 type_: path=path parameters=loption(type_parameters)
     { Type (path, parameters) }
 type_parameters: chevroned(comma_separated(type_)) { $1 }
-path: separated_nonempty_list(DOT, ID) { $1 }
+path: separated_nonempty_list(DOT, ID) { Path $1 }
 
 var: type_=type_ name=ID value=preceded(EQ, expr)? SEMI
   { {type_; name; value} }
