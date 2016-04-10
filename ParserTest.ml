@@ -66,16 +66,24 @@ module TestStatements = struct
     statement "while (a) { return b; }" => While (a, [Return b])
 
   let () = test "expr statement" @@ fun () ->
-    statement "a < b;" => Expr (Infix (a, Lt, b));
-    statement "a < b > c;" => Expr (Infix (Infix (a, Lt, b), Gt, c))
+    statement "null.bar;" => Expr (AttributeAccess (Null, "bar"));
+    statement "(a < b);" => Expr (Infix (a, Lt, b));
+    statement "(a < b > c);" => Expr (Infix (Infix (a, Lt, b), Gt, c));
+    statement "null();" => Expr (Call (Null, []));
+    statement "a();" => Expr (Call (a, []));
+    statement "a.bar;" => Expr (AttributeAccess (a, "bar"))
 
   let () = test "local variable" @@ fun () ->
-    statement "var foo a;" =>
+    statement "foo a;" =>
       Local {type_=Type (["foo"], []); name="a"; value=None};
-    statement "var foo a = b;" =>
-      Local {type_=Type (["foo"], []); name="a"; value=Some b}
+    statement "foo a = b;" =>
+      Local {type_=Type (["foo"], []); name="a"; value=Some b};
+    statement "a < b > c;" =>
+      Local {type_=Type (["a"], [Type (["b"], [])]); name="c"; value=None}
 
   let () = test "assignment" @@ fun () ->
+    statement "a = c;"
+      => Assignment (a, c);
     statement "a.bar = c;"
       => Assignment (AttributeAccess (a, "bar"), c);
     statement "a().bar = c;"

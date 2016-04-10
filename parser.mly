@@ -10,7 +10,7 @@
        MUL DIV GE LE LT GT EQL NEQ AND OR AT
 
 %token PACKAGE CLASS INTERFACE PRIMITIVE EXTENDS RETURN MACRO NEW NULL IF ELSE
-       WHILE VAR
+       WHILE
 
 %token <string> ID STRING
 %token <int> NUMBER
@@ -93,10 +93,10 @@ statement:
 | IF condition=condition consequence=block ELSE alternative=block
     { IfElse (condition, consequence, alternative) }
 | WHILE condition=condition body=block { While (condition, body) }
-| e=expr SEMI { Expr e }
-| VAR var=var { Local var }
+| e=expr_no_infix SEMI { Expr e }
+| var=var { Local var }
 | left=ID EQ right=expr SEMI { Assignment (Identifier left, right) }
-| e=expr DOT attribute=ID EQ right=expr SEMI
+| e=expr_no_infix DOT attribute=ID EQ right=expr SEMI
     { Assignment (AttributeAccess (e, attribute), right) }
 
 parameter: type_=type_ name=ID value=preceded(EQ, expr)?
@@ -117,6 +117,20 @@ expr:
 | e=parenthesised(expr) { e }
 | ID { Identifier $1 }
 | e=expr DOT attribute=ID { AttributeAccess (e, attribute) }
+| NEW type_=type_ arguments=arguments { New (type_, arguments) }
+
+expr_no_infix:
+| STRING { String $1 }
+| NUMBER { Number $1 }
+| NULL { Null }
+| bracketed(comma_separated(expr)) { List $1 }
+| braced(comma_separated(separated_pair(expr, COLON, expr))) { Map $1 }
+(* | left=expr op=infix_operator right=expr { Infix (left, op, right) } *)
+| op=unary_operator e=expr %prec UNARY_PRECEDENCE { Unary (op, e) }
+| e=expr_no_infix arguments=arguments { Call (e, arguments) }
+| e=parenthesised(expr) { e }
+(* | ID { Identifier $1 } *)
+| e=expr_no_infix DOT attribute=ID { AttributeAccess (e, attribute) }
 | NEW type_=type_ arguments=arguments { New (type_, arguments) }
 
 arguments: parenthesised(comma_separated(expr)) { $1 }

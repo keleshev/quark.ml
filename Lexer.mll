@@ -14,7 +14,6 @@
     | "if"        -> IF
     | "else"      -> ELSE
     | "while"     -> WHILE
-    | "var"       -> VAR
     | other       -> ID other
 }
 
