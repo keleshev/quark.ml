@@ -149,7 +149,7 @@ module TestTopLevelItems = struct
            {annotations=[];
             item=Hierarchy (Class, "baz", [], None, [])};
            {annotations=[];
-            item=NamespaceMacro (Signature (type_ "int", "MACRO", []), a)};
+            item=Macro (Signature (type_ "int", "MACRO", []), a)};
          ]))
 
   let () = test "package" @@ fun () ->
@@ -169,7 +169,7 @@ module TestTopLevel = struct
         {annotations=[];
          item=NamespaceItem (Namespace ("foo", []))};
         {annotations=[];
-         item=TopLevelMacro (Signature (type_ "int", "bar", []), a)};
+         item=NamespaceItem (Macro (Signature (type_ "int", "bar", []), a))};
       ];
     top "@qux namespace foo { }
          @mux(b, c) @lux macro int bar() a;"
@@ -177,6 +177,6 @@ module TestTopLevel = struct
         {annotations=["qux", []];
          item=NamespaceItem (Namespace ("foo", []))};
         {annotations=["mux", [b; c]; "lux", []];
-         item= TopLevelMacro (Signature (type_ "int", "bar", []), a)};
+         item=NamespaceItem (Macro (Signature (type_ "int", "bar", []), a))};
       ]
 end

@@ -46,10 +46,7 @@ top_level_item:
 | USE url=URL SEMI { Use url }
 | INCLUDE url=URL SEMI { Include url }
 | PACKAGE name=ID version=VERSION SEMI { Package (name, version) }
-| function_ { NamespaceItem $1 }
-| class_ { NamespaceItem $1 }
-| namespace { NamespaceItem $1 }
-| macro { TopLevelMacro $1 }
+| namespace_item { NamespaceItem $1 }
 
 function_: signature=signature body=block { Function (signature, body) }
 
@@ -64,7 +61,7 @@ namespace_item:
 | namespace { $1 }
 | class_ { $1 }
 | function_ { $1 }
-| macro { NamespaceMacro $1 }
+| macro { Macro $1 }
 
 %inline namespace_keyword: PACKAGE | NAMESPACE {}
 

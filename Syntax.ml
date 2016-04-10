@@ -69,7 +69,7 @@ type namespace_item =
   | Function of signature * statement list
   | Hierarchy of hierarchy * string * type_ list * string option
                 * class_item annotated list
-  | NamespaceMacro of macro
+  | Macro of macro
   [@@deriving to_yojson]
 
 type top_level_item =
@@ -77,7 +77,6 @@ type top_level_item =
   | Include of string
   | Package of string * string
   | NamespaceItem of namespace_item
-  | TopLevelMacro of macro
   [@@deriving to_yojson]
 
 type top_level = TopLevel of top_level_item annotated list
