@@ -106,31 +106,24 @@ condition: parenthesised(expr) { $1 }
 block: braced(statement*) { $1 }
 
 expr:
-| STRING { String $1 }
-| NUMBER { Number $1 }
-| NULL { Null }
-| bracketed(comma_separated(expr)) { List $1 }
-| braced(comma_separated(separated_pair(expr, COLON, expr))) { Map $1 }
+| make_expr(expr) { $1 }
 | left=expr op=infix_operator right=expr { Infix (left, op, right) }
-| op=unary_operator e=expr %prec UNARY_PRECEDENCE { Unary (op, e) }
-| e=expr arguments=arguments { Call (e, arguments) }
-| e=parenthesised(expr) { e }
 | ID { Identifier $1 }
-| e=expr DOT attribute=ID { AttributeAccess (e, attribute) }
-| NEW type_=type_ arguments=arguments { New (type_, arguments) }
 
 expr_no_infix:
+| make_expr(expr_no_infix) { $1 }
+(* | ID { Identifier $1 } *)
+
+make_expr(__expr__):
 | STRING { String $1 }
 | NUMBER { Number $1 }
 | NULL { Null }
 | bracketed(comma_separated(expr)) { List $1 }
 | braced(comma_separated(separated_pair(expr, COLON, expr))) { Map $1 }
-(* | left=expr op=infix_operator right=expr { Infix (left, op, right) } *)
 | op=unary_operator e=expr %prec UNARY_PRECEDENCE { Unary (op, e) }
-| e=expr_no_infix arguments=arguments { Call (e, arguments) }
+| e=__expr__ arguments=arguments { Call (e, arguments) }
 | e=parenthesised(expr) { e }
-(* | ID { Identifier $1 } *)
-| e=expr_no_infix DOT attribute=ID { AttributeAccess (e, attribute) }
+| e=__expr__ DOT attribute=ID { AttributeAccess (e, attribute) }
 | NEW type_=type_ arguments=arguments { New (type_, arguments) }
 
 arguments: parenthesised(comma_separated(expr)) { $1 }
