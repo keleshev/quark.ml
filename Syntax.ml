@@ -1,7 +1,12 @@
 type type_ = Type of string list * type_ list
+  [@@deriving to_yojson]
 
-type infix = And | Or | Plus | Minus | Mul | Div | Ge | Le | Lt | Gt | Eql | Neq
+type infix =
+  And | Or | Plus | Minus | Mul | Div | Ge | Le | Lt | Gt | Eql | Neq
+  [@@deriving to_yojson]
+
 type unary = Not | Twiddle | Negated
+  [@@deriving to_yojson]
 
 type expr =
   | String of string
@@ -15,13 +20,19 @@ type expr =
   | Identifier of string
   | AttributeAccess of expr * string
   | New of type_ * expr list
+  [@@deriving to_yojson]
 
 type parameter = {type_: type_; name: string; default: expr option}
+  [@@deriving to_yojson]
 
 type annotation = string * expr list
+  [@@deriving to_yojson]
+
 type 'a annotated = annotation list * 'a
+  [@@deriving to_yojson]
 
 type variable = type_ * string * expr option
+  [@@deriving to_yojson]
 
 type statement =
   | Return of expr
@@ -31,12 +42,16 @@ type statement =
   | Expr of expr
   | Local of variable
   | Assignment of expr * expr
+  [@@deriving to_yojson]
 
 type signature = type_ * string * parameter list
+  [@@deriving to_yojson]
 
 type hierarchy = Class | Interface | Primitive
+  [@@deriving to_yojson]
 
 type macro = signature * expr
+  [@@deriving to_yojson]
 
 type class_item =
   | Prototype of signature
@@ -44,13 +59,19 @@ type class_item =
   | Field of variable
   | Constructor of string * parameter list * statement list
   | ClassMacro of macro
+  [@@deriving to_yojson]
 
 type package_item =
   | Package of string * package_item annotated list
   | Function of signature * statement list
   | Hierarchy of hierarchy * string * type_ list * string option
                 * class_item annotated list
+  [@@deriving to_yojson]
 
 type top_level_item = PackageItem of package_item | TopLevelMacro of macro
+  [@@deriving to_yojson]
 
 type top_level = top_level_item annotated list
+  [@@deriving to_yojson]
+
+let to_json = top_level_to_yojson
