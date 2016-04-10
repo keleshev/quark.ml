@@ -45,7 +45,7 @@ type statement =
   | Return of expr option
   | Break
   | Continue
-  | Import of import
+  | ImportStatement of import
   | If of expr * statement list
   | IfElse of expr * statement list * statement list
   | While of expr * statement list
@@ -84,6 +84,7 @@ type namespace_item =
 type top_level_item =
   | Use of string
   | Include of string
+  | Import of import
   | Package of string * string
   | NamespaceItem of namespace_item
   [@@deriving to_yojson]

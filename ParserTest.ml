@@ -67,9 +67,9 @@ module TestStatements = struct
 
   let () = test "import" @@ fun () ->
     statement "import foo.baz;"
-      => Import {path=["foo"; "baz"]; alias=None};
+      => ImportStatement {path=["foo"; "baz"]; alias=None};
     statement "import foo.baz as qux;"
-      => Import {path=["foo"; "baz"]; alias=Some "qux"}
+      => ImportStatement {path=["foo"; "baz"]; alias=Some "qux"}
 
   let () = test "if else" @@ fun () ->
     statement "if (a) { return a; }" => If (a, [Return (Some a)]);
@@ -179,6 +179,12 @@ module TestTopLevelItems = struct
   let () = test "use/include" @@ fun () ->
     item "use http://foo.bar;" => Use "http://foo.bar";
     item "include http://foo.bar;" => Include "http://foo.bar"
+
+  let () = test "import" @@ fun () ->
+    item "import foo.baz;"
+      => Import {path=["foo"; "baz"]; alias=None};
+    item "import foo.baz as qux;"
+      => Import {path=["foo"; "baz"]; alias=Some "qux"}
 end
 
 module TestTopLevel = struct

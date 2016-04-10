@@ -46,6 +46,7 @@ top_level_item:
 | USE url=URL SEMI { Use url }
 | INCLUDE url=URL SEMI { Include url }
 | PACKAGE name=ID version=VERSION SEMI { Package (name, version) }
+| import { Import $1 }
 | namespace_item { NamespaceItem $1 }
 
 function_: signature=signature body=block { Function (signature, body) }
@@ -93,11 +94,13 @@ path: separated_nonempty_list(DOT, ID) { $1 }
 var: type_=type_ name=ID value=preceded(EQ, expr)? SEMI
   { {type_; name; value} }
 
+import: IMPORT path=path alias=preceded(AS, ID)? SEMI { {path; alias} }
+
 statement:
 | RETURN e=expr? SEMI { Return e }
 | BREAK SEMI { Break }
 | CONTINUE SEMI { Continue }
-| IMPORT path=path alias=preceded(AS, ID)? SEMI { Import {path; alias} }
+| import { ImportStatement $1 }
 | IF condition=condition consequence=block { If (condition, consequence) }
 | IF condition=condition consequence=block ELSE alternative=block
     { IfElse (condition, consequence, alternative) }
