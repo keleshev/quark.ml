@@ -10,7 +10,7 @@
        MUL DIV GE LE LT GT EQL NEQ AND OR AT
 
 %token PACKAGE CLASS INTERFACE PRIMITIVE EXTENDS RETURN MACRO NEW NULL IF ELSE
-       WHILE NAMESPACE USE INCLUDE STATIC BREAK CONTINUE
+       WHILE NAMESPACE USE INCLUDE STATIC BREAK CONTINUE IMPORT AS
 
 %token <string> ID STRING VERSION URL
 %token <int> NUMBER
@@ -97,6 +97,7 @@ statement:
 | RETURN e=expr SEMI { Return e }
 | BREAK SEMI { Break }
 | CONTINUE SEMI { Continue }
+| IMPORT path=path alias=preceded(AS, ID)? SEMI { Import {path; alias} }
 | IF condition=condition consequence=block { If (condition, consequence) }
 | IF condition=condition consequence=block ELSE alternative=block
     { IfElse (condition, consequence, alternative) }

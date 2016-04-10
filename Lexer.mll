@@ -6,6 +6,8 @@
     | "namespace" -> NAMESPACE
     | "use"       -> USE
     | "include"   -> INCLUDE
+    | "import"    -> IMPORT
+    | "as"        -> AS
     | "static"    -> STATIC
     | "break"     -> BREAK
     | "continue"  -> CONTINUE

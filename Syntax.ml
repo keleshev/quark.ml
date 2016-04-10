@@ -37,10 +37,14 @@ type 'a annotated = {annotations: annotation list; item: 'a}
 type variable = binding
   [@@deriving to_yojson]
 
+type import = {path: string list; alias: string option}
+  [@@deriving to_yojson]
+
 type statement =
   | Return of expr
   | Break
   | Continue
+  | Import of import
   | If of expr * statement list
   | IfElse of expr * statement list * statement list
   | While of expr * statement list

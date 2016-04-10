@@ -62,6 +62,12 @@ module TestStatements = struct
     statement "continue;" => Continue;
     statement "break;" => Break
 
+  let () = test "import" @@ fun () ->
+    statement "import foo.baz;"
+      => Import {path=["foo"; "baz"]; alias=None};
+    statement "import foo.baz as qux;"
+      => Import {path=["foo"; "baz"]; alias=Some "qux"}
+
   let () = test "if else" @@ fun () ->
     statement "if (a) { return a; }" => If (a, [Return a]);
     statement "if (a) { return a; } else { return b; }"
