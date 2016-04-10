@@ -155,6 +155,10 @@ module TestTopLevelItems = struct
   let () = test "package" @@ fun () ->
     item "package foo 1.2.3-ab.cd+12.34;"
       => Package ("foo", "1.2.3-ab.cd+12.34")
+
+  let () = test "use/include" @@ fun () ->
+    item "use http://foo.bar;" => Use "http://foo.bar";
+    item "include http://foo.bar;" => Include "http://foo.bar"
 end
 
 module TestTopLevel = struct

@@ -10,9 +10,9 @@
        MUL DIV GE LE LT GT EQL NEQ AND OR AT
 
 %token PACKAGE CLASS INTERFACE PRIMITIVE EXTENDS RETURN MACRO NEW NULL IF ELSE
-       WHILE NAMESPACE
+       WHILE NAMESPACE USE INCLUDE
 
-%token <string> ID STRING VERSION
+%token <string> ID STRING VERSION URL
 %token <int> NUMBER
 
 %token EOF
@@ -43,6 +43,8 @@ annotation: AT name=ID arguments=loption(arguments) { name, arguments }
 annotated(ITEM): annotations=annotation* item=ITEM { {annotations; item} }
 
 top_level_item:
+| USE url=URL SEMI { Use url }
+| INCLUDE url=URL SEMI { Include url }
 | PACKAGE name=ID version=VERSION SEMI { Package (name, version) }
 | function_ { NamespaceItem $1 }
 | class_ { NamespaceItem $1 }

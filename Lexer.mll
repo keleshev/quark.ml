@@ -4,6 +4,8 @@
   let parse_identifier = function
     | "package"   -> PACKAGE
     | "namespace" -> NAMESPACE
+    | "use"       -> USE
+    | "include"   -> INCLUDE
     | "class"     -> CLASS
     | "interface" -> INTERFACE
     | "primitive" -> PRIMITIVE
@@ -28,6 +30,8 @@ let pre_release = section ('.' section)*
 let build_metadata = section ('.' section)*
 let version =
   numeric '.' numeric '.' numeric ('-' pre_release)? ('+' build_metadata)?
+
+let url = ['a'-'z']+ "://" (_ # [' ' '\t' ';'])+
 
 rule read = parse
   | whitespace { read lexbuf }
@@ -58,7 +62,9 @@ rule read = parse
   | "||" { OR      }
   | "@"  { AT      }
   | version as string { VERSION string }
+  | url as string { URL string }
   | '"' (_* as string) '"' { STRING string }
   | ['0'-'9']* as number { NUMBER (int_of_string number) }
   | identifier as id { parse_identifier id }
+  | _ { failwith "lexer error" }
   | eof { EOF }
