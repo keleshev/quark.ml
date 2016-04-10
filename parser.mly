@@ -23,9 +23,10 @@
 %left GE LE LT GT EQL NEQ
 %left PLUS MINUS
 %left MUL DIV
-%left UNARY_PRECEDENCE
+%nonassoc __unary_precedence__
 %left LPR
 %left DOT
+%nonassoc __expr_no_infix_id_precedence__
 
 %%
 
@@ -112,7 +113,7 @@ expr:
 
 expr_no_infix:
 | make_expr(expr_no_infix) { $1 }
-(* | ID { Identifier $1 } *)
+| ID %prec __expr_no_infix_id_precedence__ { Identifier $1 }
 
 make_expr(__expr__):
 | STRING { String $1 }
@@ -120,7 +121,7 @@ make_expr(__expr__):
 | NULL { Null }
 | bracketed(comma_separated(expr)) { List $1 }
 | braced(comma_separated(separated_pair(expr, COLON, expr))) { Map $1 }
-| op=unary_operator e=expr %prec UNARY_PRECEDENCE { Unary (op, e) }
+| op=unary_operator e=expr %prec __unary_precedence__ { Unary (op, e) }
 | e=__expr__ arguments=arguments { Call (e, arguments) }
 | e=parenthesised(expr) { e }
 | e=__expr__ DOT attribute=ID { AttributeAccess (e, attribute) }
