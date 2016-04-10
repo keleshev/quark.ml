@@ -7,6 +7,8 @@
     | "use"       -> USE
     | "include"   -> INCLUDE
     | "static"    -> STATIC
+    | "break"     -> BREAK
+    | "continue"  -> CONTINUE
     | "class"     -> CLASS
     | "interface" -> INTERFACE
     | "primitive" -> PRIMITIVE

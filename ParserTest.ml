@@ -57,8 +57,10 @@ module TestExprs = struct
 end
 
 module TestStatements = struct
-  let () = test "return" @@ fun () ->
-    statement "return a;" => Return a
+  let () = test "return/break/continue" @@ fun () ->
+    statement "return a;" => Return a;
+    statement "continue;" => Continue;
+    statement "break;" => Break
 
   let () = test "if else" @@ fun () ->
     statement "if (a) { return a; }" => If (a, [Return a]);
@@ -124,7 +126,7 @@ module TestTopLevelItems = struct
             macro int MACRO() a;
           }"
       => NamespaceItem (Hierarchy (Class, "Foo", [type_ "T";
-                                                type_ "U"], Some "Bar", [
+                                                  type_ "U"], Some "Bar", [
            {annotations=[];
             item=Field {type_=type_ "int"; name="field"; value=Some a}};
            {annotations=[];
