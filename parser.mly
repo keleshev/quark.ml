@@ -10,7 +10,7 @@
        MUL DIV GE LE LT GT EQL NEQ AND OR AT
 
 %token PACKAGE CLASS INTERFACE PRIMITIVE EXTENDS RETURN MACRO NEW NULL IF ELSE
-       WHILE NAMESPACE USE INCLUDE
+       WHILE NAMESPACE USE INCLUDE STATIC
 
 %token <string> ID STRING VERSION URL
 %token <int> NUMBER
@@ -68,7 +68,9 @@ namespace_item:
 class_item:
 | signature SEMI { Prototype $1  }
 | signature=signature body=block { Method (signature, body) }
-| var { Field $1 }
+| STATIC signature=signature body=block { StaticMethod (signature, body) }
+| var=var { Field var }
+| STATIC var=var { StaticField var }
 | name=ID parameters=parameters body=block
     { Constructor (name, parameters, body) }
 | macro { ClassMacro $1 }

@@ -59,7 +59,9 @@ type macro = signature * expr
 type class_item =
   | Prototype of signature
   | Method of signature * statement list
+  | StaticMethod of signature * statement list
   | Field of variable
+  | StaticField of variable
   | Constructor of string * parameter list * statement list
   | ClassMacro of macro
   [@@deriving to_yojson]

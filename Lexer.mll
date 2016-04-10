@@ -6,6 +6,7 @@
     | "namespace" -> NAMESPACE
     | "use"       -> USE
     | "include"   -> INCLUDE
+    | "static"    -> STATIC
     | "class"     -> CLASS
     | "interface" -> INTERFACE
     | "primitive" -> PRIMITIVE

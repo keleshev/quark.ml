@@ -116,9 +116,11 @@ module TestTopLevelItems = struct
   let () = test "class" @@ fun () ->
     item "class Foo<T, U> extends Bar {
             int field = a;
+            static int field = a;
             constructor() { return a; }
             int prototype();
             int method() { return a; }
+            static int method() { return a; }
             macro int MACRO() a;
           }"
       => NamespaceItem (Hierarchy (Class, "Foo", [type_ "T";
@@ -126,11 +128,15 @@ module TestTopLevelItems = struct
            {annotations=[];
             item=Field {type_=type_ "int"; name="field"; value=Some a}};
            {annotations=[];
+            item=StaticField {type_=type_ "int"; name="field"; value=Some a}};
+           {annotations=[];
             item=Constructor ("constructor", [], [Return a])};
            {annotations=[];
             item=Prototype (Signature (type_ "int", "prototype", []))};
            {annotations=[];
            item=Method (Signature (type_ "int", "method", []), [Return a])};
+           {annotations=[];
+           item=StaticMethod (Signature (type_ "int", "method", []), [Return a])};
            {annotations=[];
             item=ClassMacro (Signature (type_ "int", "MACRO", []), a)};
          ]))
