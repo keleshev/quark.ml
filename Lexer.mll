@@ -45,6 +45,23 @@ let url = ['a'-'z']+ "://" (_ # [' ' '\t' ';'])+
 let hex_digit = ['a'-'f' 'A'-'F' '0'-'9']
 let escape_sequence = '\\' ('\\' | 'n' | 'r' | 't' | 'x' hex_digit hex_digit)
 
+(* Digits *)
+let nonzero_dec = ['1'-'9']
+let dec_digit = ['0'-'9']
+let oct_digit = ['0'-'7']
+let hex_digit = ['a'-'f' 'A'-'F'] | dec_digit
+
+(* Number Literals *)
+let dec_literal = (dec_digit | '_')+
+let exponent = ('E' | 'e') ('-' | '+')? dec_literal
+let float_suffix = (exponent | '.' dec_literal exponent?)
+let number_literal = nonzero_dec (dec_digit | '_')* float_suffix?
+                   | '0' (       (dec_digit | '_')* float_suffix?
+                         | 'b'   ('1' | '0' | '_')+
+                         | 'o'   (oct_digit | '_')+
+                         | 'x'   (hex_digit | '_')+
+                         )
+
 rule read = parse
   | whitespace { read lexbuf }
   | "{"  { LBR     }
@@ -77,7 +94,7 @@ rule read = parse
   | version as string { VERSION string }
   | url as string { URL string }
   | '"' { read_string (Buffer.create 16) lexbuf }
-  | ['0'-'9']* as number { NUMBER (int_of_string number) }
+  | number_literal as string { NUMBER string }
   | identifier as id { parse_identifier id }
   | eof { EOF }
   | _ { failwith "lexer error" }

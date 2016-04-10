@@ -21,14 +21,20 @@ module TestExprs = struct
     expr {|"hai"|} => String "hai";
     expr {|"\n \r \t \\ \x41"|} => String "\n \r \t \\ A"
 
+  let () = test "numbers" @@ fun () ->
+    expr "123"           => Number "123";
+    expr "123.45e67"     => Number "123.45e67";
+    expr "0xff_ee"       => Number "0xff_ee";
+    expr "0b1111_1010"   => Number "0b1111_1010"
+
   let () = test "literals" @@ fun () ->
-    expr "123" => Number 123;
+    expr "123" => Number "123";
     expr "null" => Null;
     expr "true" => Boolean true;
     expr "false" => Boolean false;
-    expr "[123, null, \"hai\"]" => List [Number 123; Null; String "hai"];
-    expr "{123: null, \"hai\": 456}" => Map [Number 123, Null;
-                                             String "hai", Number 456]
+    expr "[123, null, \"hai\"]" => List [Number "123"; Null; String "hai"];
+    expr "{123: null, \"hai\": 456}" => Map [Number "123", Null;
+                                             String "hai", Number "456"]
 
   let () = test "infix & precedence" @@ fun () ->
     expr "a || b && c" => Infix (a, Or, Infix (b, And, c));
@@ -43,7 +49,7 @@ module TestExprs = struct
 
   let () = test "attribute" @@ fun () ->
     expr "foo.bar" => AttributeAccess (Identifier "foo", "bar");
-    expr "123.bar" => AttributeAccess (Number 123, "bar")
+    expr "123.bar" => AttributeAccess (Number "123", "bar")
 
   let () = test "call" @@ fun () ->
     expr "foo()" => Call (Identifier "foo", []);
