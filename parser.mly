@@ -36,10 +36,10 @@ parse_type: type_ EOF { $1 }
 parse_top_level_item: top_level_item EOF { $1 }
 parse_top_level: top_level EOF { $1 }
 
-top_level: annotated(top_level_item)* { $1 }
+top_level: annotated(top_level_item)* { TopLevel $1 }
 
 annotation: AT name=ID arguments=loption(arguments) { name, arguments }
-annotated(ITEM): items=pair(annotation*, ITEM) { items }
+annotated(ITEM): annotations=annotation* item=ITEM { {annotations; item} }
 
 top_level_item:
 | function_ { PackageItem $1 }
@@ -72,7 +72,7 @@ class_item:
 macro: MACRO signature=signature e=expr SEMI { signature, e }
 
 signature: type_=type_ name=ID parameters=parameters
-    { type_, name, parameters }
+    { Signature (type_, name, parameters) }
 
 hierarchy:
 | CLASS { Class }
@@ -84,8 +84,8 @@ type_: path=path parameters=loption(type_parameters)
 type_parameters: chevroned(comma_separated(type_)) { $1 }
 path: separated_nonempty_list(DOT, ID) { $1 }
 
-var: type_=type_ name=ID initial=preceded(EQ, expr)? SEMI
-    { type_, name, initial }
+var: type_=type_ name=ID value=preceded(EQ, expr)? SEMI
+  { {type_; name; value} }
 
 statement:
 | RETURN e=expr SEMI { Return e }
@@ -97,8 +97,8 @@ statement:
 | VAR var=var { Local var }
 | left=lvalue EQ right=expr SEMI { Assignment (left, right) }
 
-parameter: type_=type_ name=ID default=preceded(EQ, expr)?
-    { {type_; name; default} }
+parameter: type_=type_ name=ID value=preceded(EQ, expr)?
+  { {type_; name; value} }
 parameters: parenthesised(comma_separated(parameter)) { $1 }
 condition: parenthesised(expr) { $1 }
 block: braced(statement*) { $1 }

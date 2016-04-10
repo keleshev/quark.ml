@@ -70,8 +70,10 @@ module TestStatements = struct
     statement "a < b > c;" => Expr (Infix (Infix (a, Lt, b), Gt, c))
 
   let () = test "local variable" @@ fun () ->
-    statement "var foo a;" => Local (Type (["foo"], []), "a", None);
-    statement "var foo a = b;" => Local (Type (["foo"], []), "a", Some b)
+    statement "var foo a;" =>
+      Local {type_=Type (["foo"], []); name="a"; value=None};
+    statement "var foo a = b;" =>
+      Local {type_=Type (["foo"], []); name="a"; value=Some b}
 
   let () = test "assignment" @@ fun () ->
     statement "a.bar = c;"
@@ -95,9 +97,9 @@ let type_ name = Type ([name], [])
 module TestTopLevelItems = struct
   let () = test "function" @@ fun () ->
     item "int f(bool b=true, char c) { return a; }"
-      => PackageItem (Function ((type_ "int", "f", [
-        {type_=type_ "bool"; name="b"; default=Some (Identifier "true")};
-        {type_=type_ "char"; name="c"; default=None};
+      => PackageItem (Function (Signature (type_ "int", "f", [
+        {type_=type_ "bool"; name="b"; value=Some (Identifier "true")};
+        {type_=type_ "char"; name="c"; value=None};
       ]), [Return a]))
 
   let () = test "class" @@ fun () ->
@@ -109,12 +111,17 @@ module TestTopLevelItems = struct
             macro int MACRO() a;
           }"
       => PackageItem (Hierarchy (Class, "Foo", [type_ "T";
-                                                   type_ "U"], Some "Bar", [
-           [], Field (type_ "int", "field", Some a);
-           [], Constructor ("constructor", [], [Return a]);
-           [], Prototype (type_ "int", "prototype", []);
-           [], Method ((type_ "int", "method", []), [Return a]);
-           [], ClassMacro ((type_ "int", "MACRO", []), a);
+                                                type_ "U"], Some "Bar", [
+           {annotations=[];
+            item=Field {type_=type_ "int"; name="field"; value=Some a}};
+           {annotations=[];
+            item=Constructor ("constructor", [], [Return a])};
+           {annotations=[];
+            item=Prototype (Signature (type_ "int", "prototype", []))};
+           {annotations=[];
+           item=Method (Signature (type_ "int", "method", []), [Return a])};
+           {annotations=[];
+            item=ClassMacro (Signature (type_ "int", "MACRO", []), a)};
          ]))
 
   let () = test "class" @@ fun () ->
@@ -124,9 +131,13 @@ module TestTopLevelItems = struct
             class baz { }
           }"
       => PackageItem (Package ("foo", [
-           [], Package ("bar", []);
-           [], Function ((type_ "int", "function", []), [Return a]);
-           [], Hierarchy (Class, "baz", [], None, []);
+           {annotations=[];
+            item=Package ("bar", [])};
+           {annotations=[];
+            item=Function (Signature (type_ "int", "function", []),
+                           [Return a])};
+           {annotations=[];
+            item=Hierarchy (Class, "baz", [], None, [])};
          ]))
 end
 
@@ -134,16 +145,18 @@ module TestTopLevel = struct
   let () = test "top_level" @@ fun () ->
     top "package foo { }
          macro int bar() a;"
-      => [
-        [], PackageItem (Package ("foo", []));
-        [], TopLevelMacro ((type_ "int", "bar", []), a);
+      => TopLevel [
+        {annotations=[];
+         item=PackageItem (Package ("foo", []))};
+        {annotations=[];
+         item=TopLevelMacro (Signature (type_ "int", "bar", []), a)};
       ];
     top "@qux package foo { }
          @mux(b, c) @lux macro int bar() a;"
-      => [
-        ["qux", []],
-          PackageItem (Package ("foo", []));
-        ["mux", [b; c]; "lux", []],
-          TopLevelMacro ((type_ "int", "bar", []), a);
+      => TopLevel [
+        {annotations=["qux", []];
+         item=PackageItem (Package ("foo", []))};
+        {annotations=["mux", [b; c]; "lux", []];
+         item= TopLevelMacro (Signature (type_ "int", "bar", []), a)};
       ]
 end

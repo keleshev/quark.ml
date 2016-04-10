@@ -22,16 +22,19 @@ type expr =
   | New of type_ * expr list
   [@@deriving to_yojson]
 
-type parameter = {type_: type_; name: string; default: expr option}
+type binding = {type_: type_; name: string; value: expr option}
+  [@@deriving to_yojson]
+
+type parameter = binding
   [@@deriving to_yojson]
 
 type annotation = string * expr list
   [@@deriving to_yojson]
 
-type 'a annotated = annotation list * 'a
+type 'a annotated = {annotations: annotation list; item: 'a}
   [@@deriving to_yojson]
 
-type variable = type_ * string * expr option
+type variable = binding
   [@@deriving to_yojson]
 
 type statement =
@@ -44,7 +47,7 @@ type statement =
   | Assignment of expr * expr
   [@@deriving to_yojson]
 
-type signature = type_ * string * parameter list
+type signature = Signature of type_ * string * parameter list
   [@@deriving to_yojson]
 
 type hierarchy = Class | Interface | Primitive
@@ -71,7 +74,7 @@ type package_item =
 type top_level_item = PackageItem of package_item | TopLevelMacro of macro
   [@@deriving to_yojson]
 
-type top_level = top_level_item annotated list
+type top_level = TopLevel of top_level_item annotated list
   [@@deriving to_yojson]
 
 let to_json = top_level_to_yojson
