@@ -1,0 +1,5 @@
+S vendor
+B _build
+B _build/vendor
+PKG core
+PKG ppx_deriving_yojson
