@@ -69,8 +69,8 @@ class_item:
 | signature SEMI { Prototype $1  }
 | signature=signature body=block { Method (signature, body) }
 | STATIC signature=signature body=block { StaticMethod (signature, body) }
-| var=var { Field var }
-| STATIC var=var { StaticField var }
+| variable_declaration { Field $1 }
+| STATIC variable_declaration { StaticField $2 }
 | name=ID parameters=parameters body=block
     { Constructor (name, parameters, body) }
 | macro { ClassMacro $1 }
@@ -90,8 +90,9 @@ type_: path=path parameters=loption(type_parameters)
 type_parameters: chevroned(comma_separated(type_)) { $1 }
 path: separated_nonempty_list(DOT, ID) { Path $1 }
 
-var: type_=type_ name=ID value=preceded(EQ, expr)? SEMI
-  { {type_; name; value} }
+binding: type_=type_ name=ID value=preceded(EQ, expr)? { {type_; name; value} }
+
+variable_declaration: binding SEMI { $1 }
 
 import: IMPORT path=path alias=preceded(AS, ID)? SEMI { {path; alias} }
 
@@ -105,14 +106,12 @@ statement:
     { IfElse (condition, consequence, alternative) }
 | WHILE condition=condition body=block { While (condition, body) }
 | e=expr_no_infix SEMI { Expr e }
-| var=var { Local var }
+| variable_declaration { Local $1 }
 | left=ID EQ right=expr SEMI { Assignment (Identifier left, right) }
 | e=expr_no_infix DOT attribute=ID EQ right=expr SEMI
     { Assignment (AttributeAccess (e, attribute), right) }
 
-parameter: type_=type_ name=ID value=preceded(EQ, expr)?
-  { {type_; name; value} }
-parameters: parenthesised(comma_separated(parameter)) { $1 }
+parameters: parenthesised(comma_separated(binding)) { $1 }
 condition: parenthesised(expr) { $1 }
 block: braced(statement*) { $1 }
 
