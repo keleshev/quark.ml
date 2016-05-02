@@ -1,6 +1,17 @@
 {
   open Parser
 
+  let previous_token = ref SEMI
+
+  let return token =
+    previous_token := token;
+    token
+
+  let is_semicolon_required = function
+    | RBK | RPR | BREAK | CONTINUE | RETURN | TRUE | FALSE | NULL
+    | ID _ | NUMBER _ | STRING _ | URL _ | VERSION _ -> true
+    | _ -> false
+
   let parse_identifier = function
     | "package"   -> PACKAGE
     | "namespace" -> NAMESPACE
@@ -63,45 +74,51 @@ let number_literal = nonzero_dec (dec_digit | '_')* float_suffix?
 
 rule read = parse
   | [' ' '\t' '\r']+ { read lexbuf }
-  | '\n' { Lexing.new_line lexbuf; read lexbuf }
-  | "{"  { LBR     }
-  | "}"  { RBR     }
-  | "["  { LBK     }
-  | "]"  { RBK     }
-  | "("  { LPR     }
-  | ")"  { RPR     }
-  | ":"  { COLON   }
-  | ","  { COMMA   }
-  | ";"  { SEMI    }
-  | "="  { EQ      }
-  | "+"  { PLUS    }
-  | "-"  { MINUS   }
-  | "!"  { NOT     }
-  | "~"  { TWIDDLE }
-  | "."  { DOT     }
-  | "*"  { MUL     }
-  | "?"  { CAST    }
-  | "/"  { DIV     }
-  | ">=" { GE      }
-  | "<=" { LE      }
-  | ">"  { GT      }
-  | "<"  { LT      }
-  | "==" { EQL     }
-  | "!=" { NEQ     }
-  | "&&" { AND     }
-  | "||" { OR      }
-  | "@"  { AT      }
+  | '\n' {
+      Lexing.new_line lexbuf;
+      if is_semicolon_required !previous_token then
+        return SEMI
+      else
+        read lexbuf
+    }
+  | "{"  { return LBR     }
+  | "}"  { return RBR     }
+  | "["  { return LBK     }
+  | "]"  { return RBK     }
+  | "("  { return LPR     }
+  | ")"  { return RPR     }
+  | ":"  { return COLON   }
+  | ","  { return COMMA   }
+  | ";"  { return SEMI    }
+  | "="  { return EQ      }
+  | "+"  { return PLUS    }
+  | "-"  { return MINUS   }
+  | "!"  { return NOT     }
+  | "~"  { return TWIDDLE }
+  | "."  { return DOT     }
+  | "*"  { return MUL     }
+  | "?"  { return CAST    }
+  | "/"  { return DIV     }
+  | ">=" { return GE      }
+  | "<=" { return LE      }
+  | ">"  { return GT      }
+  | "<"  { return LT      }
+  | "==" { return EQL     }
+  | "!=" { return NEQ     }
+  | "&&" { return AND     }
+  | "||" { return OR      }
+  | "@"  { return AT      }
   | line_comment { read lexbuf }
-  | version as string { VERSION string }
-  | url as string { URL string }
+  | version as string { return (VERSION string) }
+  | url as string { return (URL string) }
   | '"' { read_string (Buffer.create 16) lexbuf }
-  | number_literal as string { NUMBER string }
-  | identifier as id { parse_identifier id }
-  | eof { EOF }
+  | number_literal as string { return (NUMBER string) }
+  | identifier as id { return (parse_identifier id) }
+  | eof { return EOF }
   | _ { raise Parser.Error }
 
 and read_string buffer = parse
-  | '"' { STRING (Buffer.contents buffer) }
+  | '"' { return (STRING (Buffer.contents buffer)) }
   | escape_sequence as string
     { Buffer.add_string buffer (Scanf.unescaped string);
       read_string buffer lexbuf }

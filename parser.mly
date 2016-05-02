@@ -165,4 +165,10 @@ bracketed(BODY):     LBK body=BODY RBK { body }
 chevroned(BODY):     LT  body=BODY GT { body }
 braced(BODY):        LBR body=BODY RBR { body }
 
-comma_separated(ITEM): items=separated_list(COMMA, ITEM) { items }
+comma_separated(ITEM): (* Comma-separated list with optional trailing comma *)
+  | list=reverse_list(terminated(ITEM, COMMA)) last=ITEM?
+    { List.rev (match last with None -> list | Some item -> item :: list) }
+
+reverse_list(ITEM):
+  | (* empty *) { [] }
+  | rest=reverse_list(ITEM) item=ITEM { item :: rest }

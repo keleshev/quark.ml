@@ -225,3 +225,34 @@ module TestTopLevel = struct
          item=NamespaceItem (Macro (Signature (type_ "int", "bar", []), a))};
       ]
 end
+
+let () = test "semicolon insertion" @@ fun () ->
+  item "
+    int f() {
+      break
+      continue
+      return
+      return a
+      foo a
+      foo a = null
+      a = b
+      a =
+        b
+      a = [
+        b,
+        c,
+      ]
+      a = {}; // What can we do to allow removing this semicolon?
+    }
+  " => NamespaceItem (Function (Signature (type_ "int", "f", []), [
+    Break;
+    Continue;
+    Return None;
+    Return (Some a);
+    Local {type_=Type (Path ["foo"], []); name="a"; value=None};
+    Local {type_=Type (Path ["foo"], []); name="a"; value=Some Null};
+    Assignment (a, b);
+    Assignment (a, b);
+    Assignment (a, List [b; c]);
+    Assignment (a, Map []);
+  ]))
